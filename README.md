@@ -37,7 +37,7 @@ It will generate a marketing feed of our own. To use it with your own feeds you 
 #### Example ####
 
 Basic:
-code(
+`
 $('.container').SupermagneticFeed({
   feedId: 124,
   token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NzYsImlhdCI6MTQ4Mzc5ODU2Mn0.vEkb4yPCZAg4GIBb5CDgpRyWnOUi-ahA6-zE0JpxtXw',
@@ -48,10 +48,10 @@ $('.container').SupermagneticFeed({
   youtubeSource: true,
   gridCols: 3,
 )};
-)
+`
 
 All Options:
-code(
+`
 $('.container').SupermagneticFeed({
   pluginName: "SupermagneticFeed",
   baseUrl: 'https://supermagnetic.herokuapp.com/api/v1/items',
@@ -74,4 +74,4 @@ $('.container').SupermagneticFeed({
   twitterFilter: true,
   youtubeFilter: true
 )};
-)
+`
