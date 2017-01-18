@@ -8,18 +8,18 @@ More Infos at https://www.supermagnetic.io
 
 ## Why a jquery plugin? ##
 Every frontend developer can easely connect supermagnetic to their website, app or any other channel through the REST API. https://supermagnetic.io/apidoc
-So you can do that on your on, do you?
+So you can do that on your on, can you?
 
 Truth to be told: You have to invest some time or ask professionals like the webagency rheinschafe (https://www.rheinschafe.de) to help you with it.
 
-But with this jquery plugin you can get startet within 5 minutes. It offers a basic configurable implementation to use supermagnetic on your website instantly. You can adapt it and getting things done in no time.
+But with this jquery plugin you can get started within 5 minutes. It offers a basic configurable implementation to use supermagnetic on your website instantly. You can adapt it and getting things done in no time.
 
 ## Requirements ##
 
  - jQuery
  - Masonry, http://masonry.desandro.com/, for the magic grid stuff
 
-You need to include them on your own, but can have look at the example.html 
+You need to include them on your own, but can have look at the example.html: https://htmlpreview.github.io/?https://github.com/huersch/jquery.supermagnetic/blob/master/build/example.html
 
 ## How to use ##
 
