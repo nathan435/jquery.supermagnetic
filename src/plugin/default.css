@@ -1,0 +1,273 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  padding-bottom: 1000px;
+}
+
+.clearfix {
+  clear: both;
+}
+
+.clearfix:after {
+  content: ' ';
+  display: table;
+  clear: both;
+}
+
+.smgt-filter a, .smgt-filter a:visited, .smgt-filter a:hover, .smgt-filter a:active {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    line-height: 40px;
+    transition: all 0.2s;
+    display: inline-block;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.smgt-filter a:hover {
+  color: rgba(0,0,0, 0.6);
+}
+
+.smgt-filter-selected {
+  color: rgba(0,0,0, 0.6) !important;
+}
+
+.container {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 100px;
+}
+
+
+.smgt-tile {
+  position: relative;
+  background-repeat: no-repeat;
+  background-size: cover;
+  cursor: pointer;
+}
+
+.smgt-tile img {
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+
+.smgt-tile footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(0,0,0,0.3);
+  color: #fff;
+  padding: 3px;
+  box-sizing: border-box;
+}
+
+.smgt-tile .smgt-text {
+  padding: 10px;
+  padding-bottom: 100px;
+  min-height: 70px;
+  font-size: 1.4em;
+  margin: 0;
+}
+
+.smgt-text.twitter {
+  background-color: #55ACEE;
+  color: #fff;
+}
+
+.smgt-text.facebook {
+  background-color: #3b5998;
+  color: #fff;
+}
+
+
+.smgt-tile footer p {
+  font-size: 0.7em;
+  margin: 2px;
+}
+
+.smgt-meta {
+  display: table-cell;
+  vertical-align: middle;
+  position: relative;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  padding-left: 5px;
+}
+
+.smgt-media-icon {
+  display: table-cell;
+  vertical-align: middle;
+  padding-left: 10px;
+}
+
+.smgt-media-icon {
+  font-size: 2em;
+  text-align: center;
+}
+
+
+.grid-item {
+  box-sizing: border-box;
+}
+
+.grid-item-6-col {
+  width: 16.6667%;
+}
+.grid-item-5-col {
+  width: 20%;
+}
+.grid-item-4-col {
+  width: 25%;
+}
+.grid-item-3-col {
+  width: 33.333%;
+}
+.grid-item-2-col {
+  width: 50%;
+}
+.grid-item-1-col {
+  width: 100%;
+}
+
+.grid {
+  transition: all 0.5s;
+}
+
+.loading {
+  opacity: 0;
+}
+
+.smgt-filter {
+  color: rgba(0, 0 ,0, 0.2);
+  user-select: none;
+  -webkit-user-select: none;
+  padding: 10px;
+  font-size: 1.5em;
+  position: relative;
+}
+
+.smgt-filter .smgt-filter-types {
+  float: left;
+}
+
+.smgt-filter .smgt-filter-sources {
+  float: right;
+}
+
+.smgt-detail-view {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  background: rgba(0,0,0,0.8);
+  display: none;
+}
+
+.smgt-detail-view-content {
+  width: 900px;
+  height: 80%;
+  margin: 0 auto;
+  background: #fff;
+  margin-top: 5%;
+  transition: width 0.5s;
+  position: relative;
+}
+
+.smgt-detail-image {
+  width: 100%;
+  height: 70%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.smgt-detail-text {
+  width: 100%;
+  height: 22%;
+  color: #5d5d5d;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.smgt-detail-meta {
+  width: 100%;
+  height: 8%;
+  position: relative;
+}
+
+.smgt-detail-meta a {
+  text-decoration: none;
+}
+
+.smgt-detail-meta a {
+  position: absolute;
+  right: 20px;
+  background: #9e9e9e;
+  padding: 10px 20px;
+  color: #fff;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.smgt-detail-meta a:hover {
+  background: #909090;
+}
+
+.smgt-detail-close {
+  color: #f7f7f7;
+  position: absolute;
+  right: 0;
+  top: -25px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.smgt-detail-close:hover {
+  color: #fff;
+}
+
+
+@media screen and (max-width: 1200px) {
+  .grid-item {
+    width: 50%;
+  }
+
+  .container {
+    width: 90%;
+  }
+
+  .smgt-filter a span {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .smgt-detail-view-content {
+    margin-top: 50px;
+    width: 95%;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .grid-item {
+    width: 100%;
+  }
+
+  .smgt-detail-meta a {
+    right: 0;
+    bottom: 0;
+  }
+
+  .container {
+    width: 100%;
+  }
+}
