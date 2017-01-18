@@ -31,7 +31,8 @@ Using the plugin is very straight forward:
  
 ### Parameters ###
 
-You can call SupermagneticFeed without any paramater just like this: $('.container').SupermagneticFeed()
+You can call SupermagneticFeed without any paramater just like this: 
+`$('.container').SupermagneticFeed()`
 It will generate a marketing feed of our own. To use it with your own feeds you have to at least specify 'feedId' and 'token'
 
 #### Example ####
