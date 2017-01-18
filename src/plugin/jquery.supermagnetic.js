@@ -5,8 +5,8 @@ const config = {
 
     pluginName: "SupermagneticFeed",
     baseUrl: 'https://supermagnetic.herokuapp.com/api/v1/items',
-    token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NjEsImlhdCI6MTQ4MDUxOTcxMn0._hAjjlIecUCyKfyn-oikWo_pXoUEt-cJQ4iZ0tEgvz4',
-		feedId: 17,
+    token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NzYsImlhdCI6MTQ4Mzc5ODU2Mn0.vEkb4yPCZAg4GIBb5CDgpRyWnOUi-ahA6-zE0JpxtXw',
+		feedId: 124,
     responseLimit: 5,
     facebookSource: true,
     instagramSource: true,

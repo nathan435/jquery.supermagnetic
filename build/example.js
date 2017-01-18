@@ -1,7 +1,7 @@
 'use strict';
 
 $('.container').SupermagneticFeed({
-	feedId: 68,
+	feedId: 124,
 	responseLimit: 20,
 	facebookSource: true,
 	instagramSource: true,
