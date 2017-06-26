@@ -8,11 +8,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 /* NOT TO BE MISTAKEN WITH INITIALIZATION OPTIONS */
 
 var config = {
+
   pluginName: "SupermagneticFeed",
   baseUrl: 'https://supermagnetic.herokuapp.com/api/v1/items',
-  token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NzYsImlhdCI6MTQ4Mzc5ODU2Mn0.vEkb4yPCZAg4GIBb5CDgpRyWnOUi-ahA6-zE0JpxtXw',
-  feedId: 124,
-  responseLimit: 5,
+  token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NjEsImlhdCI6MTQ4MDUxOTcxMn0._hAjjlIecUCyKfyn-oikWo_pXoUEt-cJQ4iZ0tEgvz4',
+  feedId: 4,
+  responseLimit: 30,
   facebookSource: true,
   instagramSource: true,
   twitterSource: true,
@@ -28,11 +29,10 @@ var config = {
   instagramFilter: true,
   twitterFilter: true,
   youtubeFilter: true
-};
 
-/* ---------- TEMPLATES ---------- */
+  /* ---------- TEMPLATES ---------- */
 
-var filterTemplate = function filterTemplate() {
+};var filterTemplate = function filterTemplate() {
   return '\n\t\t<div class="smgt-filter clearfix">\n      <div class="smgt-filter-types">\n      </div>\n      <div class="smgt-filter-sources">\n      </div>\n\t\t</div>\n\t';
 };
 
@@ -76,8 +76,12 @@ var textTileTemplate = function textTileTemplate(tileData, options) {
   return '\n\t<div class="grid-item grid-item-' + options.gridCols + '-col" style="padding:' + options.gridColGap + 'px">\n\t\t\t<div class="smgt-tile">\n\t\t\t\t<p class="smgt-text ' + tileData.socialMedia + '">\n\t\t\t\t\t' + tileData.text + '\n\t\t\t\t</p>\n\t\t\t\t<footer>\n\t\t\t\t\t<div class="smgt-media-icon">\n\t\t\t\t\t\t<i class="fa fa-' + tileData.socialMedia + '" aria-hidden="true"></i>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class="smgt-meta">\n\t\t\t\t\t\t<p>' + tileData.date + '</p>\n\t\t\t\t\t\t<p>' + tileData.author + '</p>\n\t\t\t\t\t</div>\n\t\t\t\t</footer>\n\t\t\t</div>\n\t</div>\n';
 };
 
+var videoTileTemplate = function videoTileTemplate(tileData, options) {
+  return '\n  <div class="grid-item grid-item-' + options.gridCols + '-col" style="padding:' + options.gridColGap + 'px">\n      <div class="smgt-tile">\n        <img src="' + tileData.imageSource + '"/>\n        <span class="fa-stack fa-lg">\n          <i class="fa fa-circle fa-stack-2x"></i>\n          <i class="fa fa-play fa-stack-1x"></i>\n        </span>\n        <footer>\n          <div class="smgt-media-icon">\n            <i class="fa fa-' + tileData.socialMedia + '" aria-hidden="true"></i>\n          </div>\n          <div class="smgt-meta">\n            <p>' + tileData.date + '</p>\n            <p>' + tileData.author + '</p>\n          </div>\n        </footer>\n      </div>\n  </div>\n';
+};
+
 var detailViewTemplate = function detailViewTemplate() {
-  return '\n  <div class="smgt-detail-view">\n    <div class="smgt-detail-view-content">\n      <a class="smgt-detail-close">Schlie\xDFen</a>\n      <div class="smgt-detail-image">\n      </div>\n      <div class="smgt-detail-text">\n      </div>\n      <div class="smgt-detail-meta">\n        <a target="_blank">BEITRAG ANSEHEN</a>\n      </div>\n    </div>\n  </div>\n';
+  return '\n  <div class="smgt-detail-view">\n    <div class="smgt-detail-view-content">\n      <a class="smgt-detail-close">Schlie\xDFen</a>\n      <div class="smgt-detail-image">\n        <span class="fa-stack fa-lg">\n          <i class="fa fa-circle fa-stack-2x"></i>\n          <i class="fa fa-play fa-stack-1x"></i>\n        </span>\n      </div>\n      <div class="smgt-detail-video">\n        <iframe class="smgt-video" src="" frameborder="0" />\n      </div>\n      <div class="smgt-detail-description">\n      </div>\n      <div class="smgt-detail-meta">\n        <a target="_blank">BEITRAG ANSEHEN</a>\n      </div>\n    </div>\n  </div>\n';
 }
 
 /* ---------- PLUGIN CODE ---------- */
@@ -132,6 +136,7 @@ var detailViewTemplate = function detailViewTemplate() {
         $('body').append(this.detailView);
 
         this.detailView.on('click', function () {
+          $('.smgt-detail-video .video-yt').attr('src', '');
           _this.detailView.fadeOut('fast');
         });
 
@@ -148,6 +153,25 @@ var detailViewTemplate = function detailViewTemplate() {
       key: 'showDetailView',
       value: function showDetailView(item) {
         // change detailview element
+        $('.smgt-detail-image').unbind('click');
+        if (item.type == 'video' && item.service == 'youtube') {
+          $('.smgt-detail-image').css('display', 'none');
+          $('.smgt-detail-video').css('display', 'block');
+          $('.smgt-detail-video .smgt-video').css('display', 'block');
+          $('.smgt-detail-video .smgt-video').attr('src', 'http://www.youtube.com/embed/' + item.external_id);
+        }
+        if (item.service == 'instagram') {
+          $('.smgt-detail-video').css('display', 'none');
+          $('.smgt-detail-image').addClass('video-preview');
+          $('.smgt-detail-image').css('display', 'block');
+          $('.smgt-detail-image').on('click', function () {
+            window.open(item.url, '_blank');
+          });
+        }
+        if (item.type == 'image' || item.type == 'photo') {
+          $('.smgt-detail-video').css('display', 'none');
+          $('.smgt-detail-image').css('display', 'block');
+        }
         console.log(item);
         $('.smgt-detail-image').css('background-image', '');
         if (item.image) {
@@ -160,7 +184,7 @@ var detailViewTemplate = function detailViewTemplate() {
           $('.smgt-detail-image').css('background-color', color);
         }
 
-        $('.smgt-detail-text').text(item.text);
+        $('.smgt-detail-description').text(item.text);
         $('.smgt-detail-meta a').prop("href", item.url);
 
         // show detail view
@@ -294,7 +318,8 @@ var detailViewTemplate = function detailViewTemplate() {
           socialMedia: item.service,
           date: date,
           author: item.profile_name,
-          text: item.text
+          text: item.text,
+          url: item.url
         };
 
         var tile = void 0;
@@ -303,6 +328,9 @@ var detailViewTemplate = function detailViewTemplate() {
           tile.data('itemid', item.id);
         } else if (item.type === 'image' || item.type === 'photo') {
           tile = $(imageTileTemplate(tileData, this.opts));
+          tile.data('itemid', item.id);
+        } else if (item.type === 'video') {
+          tile = $(videoTileTemplate(tileData, this.opts));
           tile.data('itemid', item.id);
         }
         this.$grid.append(tile).masonry('appended', tile);
@@ -323,7 +351,7 @@ var detailViewTemplate = function detailViewTemplate() {
         var imgCount = 0;
 
         for (var i = 0; i < items.length; i++) {
-          if (items[i].type === 'photo' || items[i].type === 'image') {
+          if (items[i].type === 'photo' || items[i].type === 'image' || items[i].type === 'video') {
             imgCount++;
           }
         }
