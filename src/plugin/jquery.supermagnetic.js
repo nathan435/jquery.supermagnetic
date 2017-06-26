@@ -5,9 +5,9 @@ const config = {
 
     pluginName: "SupermagneticFeed",
     baseUrl: 'https://supermagnetic.herokuapp.com/api/v1/items',
-    token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NzYsImlhdCI6MTQ4Mzc5ODU2Mn0.vEkb4yPCZAg4GIBb5CDgpRyWnOUi-ahA6-zE0JpxtXw',
-		feedId: 124,
-    responseLimit: 5,
+    token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NjEsImlhdCI6MTQ4MDUxOTcxMn0._hAjjlIecUCyKfyn-oikWo_pXoUEt-cJQ4iZ0tEgvz4',
+		feedId: 4,
+    responseLimit: 30,
     facebookSource: true,
     instagramSource: true,
     twitterSource: true,
@@ -107,13 +107,41 @@ const textTileTemplate = (tileData, options) => `
 	</div>
 `;
 
+const videoTileTemplate = (tileData, options) => `
+  <div class="grid-item grid-item-${options.gridCols}-col" style="padding:${options.gridColGap}px">
+      <div class="smgt-tile">
+        <img src="${tileData.imageSource}"/>
+        <span class="fa-stack fa-lg">
+          <i class="fa fa-circle fa-stack-2x"></i>
+          <i class="fa fa-play fa-stack-1x"></i>
+        </span>
+        <footer>
+          <div class="smgt-media-icon">
+            <i class="fa fa-${tileData.socialMedia}" aria-hidden="true"></i>
+          </div>
+          <div class="smgt-meta">
+            <p>${tileData.date}</p>
+            <p>${tileData.author}</p>
+          </div>
+        </footer>
+      </div>
+  </div>
+`;
+
 const detailViewTemplate = () => `
   <div class="smgt-detail-view">
     <div class="smgt-detail-view-content">
       <a class="smgt-detail-close">Schließen</a>
       <div class="smgt-detail-image">
+        <span class="fa-stack fa-lg">
+          <i class="fa fa-circle fa-stack-2x"></i>
+          <i class="fa fa-play fa-stack-1x"></i>
+        </span>
       </div>
-      <div class="smgt-detail-text">
+      <div class="smgt-detail-video">
+        <iframe class="smgt-video" src="" frameborder="0" />
+      </div>
+      <div class="smgt-detail-description">
       </div>
       <div class="smgt-detail-meta">
         <a target="_blank">BEITRAG ANSEHEN</a>
@@ -171,6 +199,7 @@ const detailViewTemplate = () => `
       $('body').append(this.detailView);
 
       this.detailView.on('click', () => {
+        $('.smgt-detail-video .video-yt').attr('src', '');
         this.detailView.fadeOut('fast');
       })
 
@@ -186,6 +215,25 @@ const detailViewTemplate = () => `
 
     showDetailView(item) {
       // change detailview element
+      $('.smgt-detail-image').unbind('click');
+      if (item.type == 'video' && item.service == 'youtube') {
+        $('.smgt-detail-image').css('display', 'none');
+        $('.smgt-detail-video').css('display', 'block');
+        $('.smgt-detail-video .smgt-video').css('display', 'block');
+        $('.smgt-detail-video .smgt-video').attr('src', 'http://www.youtube.com/embed/' + item.external_id);
+      }
+      if (item.service == 'instagram') {
+        $('.smgt-detail-video').css('display', 'none');
+        $('.smgt-detail-image').addClass('video-preview');
+        $('.smgt-detail-image').css('display', 'block');
+        $('.smgt-detail-image').on('click', function() {
+          window.open(item.url, '_blank');
+        })
+      }
+      if (item.type == 'image' || item.type == 'photo' ) {
+        $('.smgt-detail-video').css('display', 'none');
+        $('.smgt-detail-image').css('display', 'block');
+      }
       console.log(item);
       $('.smgt-detail-image').css('background-image', '');
       if (item.image) {
@@ -196,7 +244,7 @@ const detailViewTemplate = () => `
         $('.smgt-detail-image').css('background-color', color);
       }
 
-      $('.smgt-detail-text').text(item.text);
+      $('.smgt-detail-description').text(item.text);
       $('.smgt-detail-meta a').prop("href", item.url);
 
 
@@ -335,7 +383,8 @@ const detailViewTemplate = () => `
 					socialMedia: item.service,
 					date: date,
 					author: item.profile_name,
-					text: item.text
+					text: item.text,
+          url: item.url
 			}
 
       let tile;
@@ -345,7 +394,10 @@ const detailViewTemplate = () => `
 			} else if (item.type === 'image' || item.type === 'photo') {
 				tile = $(imageTileTemplate(tileData, this.opts));
         tile.data('itemid', item.id);
-			}
+			} else if (item.type === 'video') {
+        tile = $(videoTileTemplate(tileData, this.opts));
+        tile.data('itemid', item.id);
+      }
       this.$grid.append(tile).masonry('appended', tile);
 		}
 
@@ -361,7 +413,7 @@ const detailViewTemplate = () => `
       let imgCount = 0;
 
       for (let i=0; i < items.length; i++) {
-        if (items[i].type === 'photo' || items[i].type === 'image') {
+        if (items[i].type === 'photo' || items[i].type === 'image' || items[i].type === 'video') {
           imgCount++;
         }
       }
