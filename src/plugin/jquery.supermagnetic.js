@@ -171,8 +171,12 @@ const detailViewTemplate = () => `
       this.isloading = false;
       this.dataitems = {};
 
+      console.log(this.opts);
+
 			this.init();
 		}
+
+    restoreDefaultConfig() { this.opts = this.defaults; }
 
 		init()  {
 			// initialize grid
@@ -451,9 +455,7 @@ const detailViewTemplate = () => `
       this.isloading = false;
       this.$grid.masonry('reloadItems');
       this.$grid.masonry('layout');
-
 		}
-
 	}
 
 
