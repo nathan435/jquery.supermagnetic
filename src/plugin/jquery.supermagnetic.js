@@ -167,16 +167,13 @@ const detailViewTemplate = () => `
 			this.defaults = config;
 
 			const meta    = this.$el.data(name + '-opts');
-			this.opts     = $.extend(this.defaults, opts, meta);
+			this.opts     = $.extend(true, {}, this.defaults, meta, opts);
+
       this.isloading = false;
       this.dataitems = {};
 
-      console.log(this.opts);
-
 			this.init();
 		}
-
-    restoreDefaultConfig() { this.opts = this.defaults; }
 
 		init()  {
 			// initialize grid
