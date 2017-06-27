@@ -167,7 +167,8 @@ const detailViewTemplate = () => `
 			this.defaults = config;
 
 			const meta    = this.$el.data(name + '-opts');
-			this.opts     = $.extend(this.defaults, opts, meta);
+			this.opts     = $.extend(true, {}, this.defaults, meta, opts);
+
       this.isloading = false;
       this.dataitems = {};
 
@@ -451,9 +452,7 @@ const detailViewTemplate = () => `
       this.isloading = false;
       this.$grid.masonry('reloadItems');
       this.$grid.masonry('layout');
-
 		}
-
 	}
 
 
