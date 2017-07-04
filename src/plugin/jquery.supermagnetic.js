@@ -5,8 +5,8 @@ const config = {
 
     pluginName: "SupermagneticFeed",
     baseUrl: 'https://supermagnetic.herokuapp.com/api/v1/items',
-    token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NjEsImlhdCI6MTQ4MDUxOTcxMn0._hAjjlIecUCyKfyn-oikWo_pXoUEt-cJQ4iZ0tEgvz4',
-		feedId: 4,
+    token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MTI3LCJpYXQiOjE0OTg0NjgyNDd9.tIDfEprM0y6q5wjAuKfznc3V7ZYrIKA_y9Id3LhWmDk',
+		feedId: 177,
     responseLimit: 30,
     facebookSource: true,
     instagramSource: true,
@@ -22,7 +22,9 @@ const config = {
     facebookFilter: true,
     instagramFilter: true,
     twitterFilter: true,
-    youtubeFilter: true
+    youtubeFilter: true,
+    liveUpdate: false,
+    liveUpdateInterval: 30
 }
 
 
@@ -164,6 +166,8 @@ const detailViewTemplate = () => `
 			this.$el      = $(el);
 			this.$el.data(name, this);
 
+      this.lastData = [];
+
 			this.defaults = config;
 
 			const meta    = this.$el.data(name + '-opts');
@@ -173,6 +177,8 @@ const detailViewTemplate = () => `
       this.dataitems = {};
 
 			this.init();
+
+      window.supermagnetic = this;
 		}
 
 		init()  {
@@ -191,8 +197,29 @@ const detailViewTemplate = () => `
         type: '',
         service: ''
       });
-
+      // live update
+      if(this.opts.liveUpdate) this.liveUpdate();
 		}
+
+    liveUpdate() {
+      var self = this;
+      setInterval(() => {
+        $.when(this.makeRequest({
+          limit: this.opts.responseLimit,
+          type: '',
+          service: ''
+        })).then(function(items) {
+          var newItems = items.items.filter(item => {
+            return self.lastData.filter(da => da.id == item.id).length == 0;
+          });
+
+          self.$grid.addClass('loading');
+          self.isloading = true;
+          self.generateFeed(newItems, true);
+          self.lastData = self.lastData.concat(newItems);
+        })
+      }, this.opts.liveUpdateInterval * 1000);
+    }
 
     detailViewInit() {
       var self = this;
@@ -235,7 +262,6 @@ const detailViewTemplate = () => `
         $('.smgt-detail-video').css('display', 'none');
         $('.smgt-detail-image').css('display', 'block');
       }
-      console.log(item);
       $('.smgt-detail-image').css('background-image', '');
       if (item.image) {
         $('.smgt-detail-image').css('background-image', `url(${item.image})`);
@@ -312,7 +338,7 @@ const detailViewTemplate = () => `
             this.getFeedData({
               limit: this.opts.responseLimit,
               type: requestType,
-              service: requestService
+              requestService
             });
           }
         });
@@ -326,31 +352,31 @@ const detailViewTemplate = () => `
 			this.$el = null;
 		}
 
+    makeRequest(options, second) {
+      var self = this;
+      const limit = options.limit !== '' ? '&limit=' + options.limit : 9;
+      let type = options.type !== '' ? '&type=' + options.type : '';
+      if (second === 'image') {
+        type = '&type=photo';
+      }
+      const service = options.service !== '' ? '&service=' + options.service : '';
+
+      const url = `${self.opts.baseUrl}?feed_id=${self.opts.feedId}&access_token=${self.opts.token}${limit}${type}${service}`;
+      return $.ajax({
+        type: 'GET',
+        dataType: 'jsonp',
+        url: url
+      })
+    }
+
 		getFeedData(options) {
 			this.$grid.addClass('loading');
       this.isloading = true;
 			var self = this;
 
-
-
-      function makeRequest(options, second) {
-        const limit = options.limit !== '' ? '&limit=' + options.limit : 9;
-        let type = options.type !== '' ? '&type=' + options.type : '';
-        if (second === 'image') {
-          type = '&type=photo';
-        }
-        const service = options.service !== '' ? '&service=' + options.service : '';
-
-        const url = `${self.opts.baseUrl}?feed_id=${self.opts.feedId}&access_token=${self.opts.token}${limit}${type}${service}`;
-        return $.ajax({
-          type: 'GET',
-          dataType: 'jsonp',
-          url: url
-        })
-      }
-
       if (options.type === 'image') {
-        $.when(makeRequest(options), makeRequest(options, 'image')).done(function(r1, r2){
+        $.when(
+          this.makeRequest(options), this.makeRequest(options, 'image')).done(function(r1, r2){
           let items = r1[0].items;
           if (r2[0].items.length > 0) {
             items = items.concat(r2[0].items);
@@ -365,19 +391,16 @@ const detailViewTemplate = () => `
 
         });
       } else {
-        $.when(makeRequest(options)).done(function(r1){
+        $.when(this.makeRequest(options)).done(function(r1){
           let items = r1.items;
+          self.lastData = items;
           self.generateFeed(items);
         });
       }
-
-
-
-
 		}
 
 
-		generateTile(item) {
+		generateTile(item, prepend) {
 			let date = new Date(item.published_at).toLocaleDateString();
 			let tileData = {
 					imageSource: item.image,
@@ -399,15 +422,20 @@ const detailViewTemplate = () => `
         tile = $(videoTileTemplate(tileData, this.opts));
         tile.data('itemid', item.id);
       }
-      this.$grid.append(tile).masonry('appended', tile);
+
+      if(prepend) {
+        this.$grid.prepend(tile).masonry('prepended', tile);
+      } else {
+        this.$grid.append(tile).masonry('appended', tile);
+      }
 		}
 
-		generateFeed(items) {
+		generateFeed(items, prepend) {
 			// self.$grid.masonry('remove', $('.grid .grid-item'));
       var self = this;
 			// build tiles for each feed item
 			items.forEach((item) => {
-				this.generateTile(item);
+				this.generateTile(item, prepend);
         this.dataitems[item.id] = item;
 			})
 

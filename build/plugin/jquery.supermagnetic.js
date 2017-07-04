@@ -11,8 +11,8 @@ var config = {
 
   pluginName: "SupermagneticFeed",
   baseUrl: 'https://supermagnetic.herokuapp.com/api/v1/items',
-  token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NjEsImlhdCI6MTQ4MDUxOTcxMn0._hAjjlIecUCyKfyn-oikWo_pXoUEt-cJQ4iZ0tEgvz4',
-  feedId: 4,
+  token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MTI3LCJpYXQiOjE0OTg0NjgyNDd9.tIDfEprM0y6q5wjAuKfznc3V7ZYrIKA_y9Id3LhWmDk',
+  feedId: 177,
   responseLimit: 30,
   facebookSource: true,
   instagramSource: true,
@@ -28,7 +28,9 @@ var config = {
   facebookFilter: true,
   instagramFilter: true,
   twitterFilter: true,
-  youtubeFilter: true
+  youtubeFilter: true,
+  liveUpdate: false,
+  liveUpdateInterval: 30
 
   /* ---------- TEMPLATES ---------- */
 
@@ -97,14 +99,19 @@ var detailViewTemplate = function detailViewTemplate() {
       this.$el = $(el);
       this.$el.data(name, this);
 
+      this.lastData = [];
+
       this.defaults = config;
 
       var meta = this.$el.data(name + '-opts');
-      this.opts = $.extend(this.defaults, opts, meta);
+      this.opts = $.extend(true, {}, this.defaults, meta, opts);
+
       this.isloading = false;
       this.dataitems = {};
 
       this.init();
+
+      window.supermagnetic = this;
     }
 
     _createClass(SupermagneticFeed, [{
@@ -125,11 +132,38 @@ var detailViewTemplate = function detailViewTemplate() {
           type: '',
           service: ''
         });
+        // live update
+        if (this.opts.liveUpdate) this.liveUpdate();
+      }
+    }, {
+      key: 'liveUpdate',
+      value: function liveUpdate() {
+        var _this = this;
+
+        var self = this;
+        setInterval(function () {
+          $.when(_this.makeRequest({
+            limit: _this.opts.responseLimit,
+            type: '',
+            service: ''
+          })).then(function (items) {
+            var newItems = items.items.filter(function (item) {
+              return self.lastData.filter(function (da) {
+                return da.id == item.id;
+              }).length == 0;
+            });
+
+            self.$grid.addClass('loading');
+            self.isloading = true;
+            self.generateFeed(newItems, true);
+            self.lastData = self.lastData.concat(newItems);
+          });
+        }, this.opts.liveUpdateInterval * 1000);
       }
     }, {
       key: 'detailViewInit',
       value: function detailViewInit() {
-        var _this = this;
+        var _this2 = this;
 
         var self = this;
         this.detailView = $(detailViewTemplate());
@@ -137,7 +171,7 @@ var detailViewTemplate = function detailViewTemplate() {
 
         this.detailView.on('click', function () {
           $('.smgt-detail-video .video-yt').attr('src', '');
-          _this.detailView.fadeOut('fast');
+          _this2.detailView.fadeOut('fast');
         });
 
         this.$grid.on('click', '.grid-item', function (e) {
@@ -172,7 +206,6 @@ var detailViewTemplate = function detailViewTemplate() {
           $('.smgt-detail-video').css('display', 'none');
           $('.smgt-detail-image').css('display', 'block');
         }
-        console.log(item);
         $('.smgt-detail-image').css('background-image', '');
         if (item.image) {
           $('.smgt-detail-image').css('background-image', 'url(' + item.image + ')');
@@ -193,7 +226,7 @@ var detailViewTemplate = function detailViewTemplate() {
     }, {
       key: 'filterInit',
       value: function filterInit() {
-        var _this2 = this;
+        var _this3 = this;
 
         var self = this;
         if (this.opts.filter && (this.opts.videoFilter || this.opts.textFilter || this.opts.imageFilter || this.opts.youtubeFilter || this.opts.twitterFilter || this.opts.facebookFilter || this.opts.instagramFilter)) {
@@ -248,10 +281,10 @@ var detailViewTemplate = function detailViewTemplate() {
                   requestType = '';
               }
 
-              _this2.getFeedData({
-                limit: _this2.opts.responseLimit,
+              _this3.getFeedData({
+                limit: _this3.opts.responseLimit,
                 type: requestType,
-                service: requestService
+                requestService: requestService
               });
             }
           });
@@ -266,30 +299,32 @@ var detailViewTemplate = function detailViewTemplate() {
         this.$el = null;
       }
     }, {
+      key: 'makeRequest',
+      value: function makeRequest(options, second) {
+        var self = this;
+        var limit = options.limit !== '' ? '&limit=' + options.limit : 9;
+        var type = options.type !== '' ? '&type=' + options.type : '';
+        if (second === 'image') {
+          type = '&type=photo';
+        }
+        var service = options.service !== '' ? '&service=' + options.service : '';
+
+        var url = self.opts.baseUrl + '?feed_id=' + self.opts.feedId + '&access_token=' + self.opts.token + limit + type + service;
+        return $.ajax({
+          type: 'GET',
+          dataType: 'jsonp',
+          url: url
+        });
+      }
+    }, {
       key: 'getFeedData',
       value: function getFeedData(options) {
         this.$grid.addClass('loading');
         this.isloading = true;
         var self = this;
 
-        function makeRequest(options, second) {
-          var limit = options.limit !== '' ? '&limit=' + options.limit : 9;
-          var type = options.type !== '' ? '&type=' + options.type : '';
-          if (second === 'image') {
-            type = '&type=photo';
-          }
-          var service = options.service !== '' ? '&service=' + options.service : '';
-
-          var url = self.opts.baseUrl + '?feed_id=' + self.opts.feedId + '&access_token=' + self.opts.token + limit + type + service;
-          return $.ajax({
-            type: 'GET',
-            dataType: 'jsonp',
-            url: url
-          });
-        }
-
         if (options.type === 'image') {
-          $.when(makeRequest(options), makeRequest(options, 'image')).done(function (r1, r2) {
+          $.when(this.makeRequest(options), this.makeRequest(options, 'image')).done(function (r1, r2) {
             var items = r1[0].items;
             if (r2[0].items.length > 0) {
               items = items.concat(r2[0].items);
@@ -303,15 +338,16 @@ var detailViewTemplate = function detailViewTemplate() {
             self.generateFeed(items);
           });
         } else {
-          $.when(makeRequest(options)).done(function (r1) {
+          $.when(this.makeRequest(options)).done(function (r1) {
             var items = r1.items;
+            self.lastData = items;
             self.generateFeed(items);
           });
         }
       }
     }, {
       key: 'generateTile',
-      value: function generateTile(item) {
+      value: function generateTile(item, prepend) {
         var date = new Date(item.published_at).toLocaleDateString();
         var tileData = {
           imageSource: item.image,
@@ -333,19 +369,24 @@ var detailViewTemplate = function detailViewTemplate() {
           tile = $(videoTileTemplate(tileData, this.opts));
           tile.data('itemid', item.id);
         }
-        this.$grid.append(tile).masonry('appended', tile);
+
+        if (prepend) {
+          this.$grid.prepend(tile).masonry('prepended', tile);
+        } else {
+          this.$grid.append(tile).masonry('appended', tile);
+        }
       }
     }, {
       key: 'generateFeed',
-      value: function generateFeed(items) {
-        var _this3 = this;
+      value: function generateFeed(items, prepend) {
+        var _this4 = this;
 
         // self.$grid.masonry('remove', $('.grid .grid-item'));
         var self = this;
         // build tiles for each feed item
         items.forEach(function (item) {
-          _this3.generateTile(item);
-          _this3.dataitems[item.id] = item;
+          _this4.generateTile(item, prepend);
+          _this4.dataitems[item.id] = item;
         });
 
         var imgCount = 0;
