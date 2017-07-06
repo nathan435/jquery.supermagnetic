@@ -41,6 +41,9 @@ body {
   margin-top: 100px;
 }
 
+.smgt-caption {
+  text-align: center;
+}
 
 .smgt-tile {
   position: relative;

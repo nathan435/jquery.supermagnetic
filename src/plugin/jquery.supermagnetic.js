@@ -24,7 +24,8 @@ const config = {
     twitterFilter: true,
     youtubeFilter: true,
     liveUpdate: false,
-    liveUpdateInterval: 30
+    liveUpdateInterval: 30,
+    caption: 'Posts for #supermagnetic'
 }
 
 
@@ -182,6 +183,10 @@ const detailViewTemplate = () => `
 		}
 
 		init()  {
+      // init caption
+      if (this.opts.caption) {
+        this.$el.append(`<h1 class="smgt-caption">${this.opts.caption}</h1>`)
+      }
 			// initialize grid
 			this.filterInit();
 			this.$grid = $(gridTemplate());
