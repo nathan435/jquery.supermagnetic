@@ -24,7 +24,8 @@ const config = {
     twitterFilter: true,
     youtubeFilter: true,
     liveUpdate: false,
-    liveUpdateInterval: 30
+    liveUpdateInterval: 30,
+    caption: ''
 }
 
 
@@ -182,6 +183,15 @@ const detailViewTemplate = () => `
 		}
 
 		init()  {
+
+
+      // init caption
+      if (this.opts.caption) {
+        this.$el.append(`<h1 class="smgt-caption">${this.opts.caption}</h1>`)
+      }
+      // apply styling choices
+      this.applyStyles();
+
 			// initialize grid
 			this.filterInit();
 			this.$grid = $(gridTemplate());
@@ -221,6 +231,10 @@ const detailViewTemplate = () => `
       }, this.opts.liveUpdateInterval * 1000);
     }
 
+    applyStyles() {
+      this.$el.css('background-color', this.opts.backgroundColor);
+    }
+
     detailViewInit() {
       var self = this;
       this.detailView = $(detailViewTemplate());
@@ -228,6 +242,7 @@ const detailViewTemplate = () => `
 
       this.detailView.on('click', () => {
         $('.smgt-detail-video .video-yt').attr('src', '');
+        $('.smgt-detail-view .fa').fadeOut('fast');
         this.detailView.fadeOut('fast');
       })
 
@@ -244,6 +259,7 @@ const detailViewTemplate = () => `
     showDetailView(item) {
       // change detailview element
       $('.smgt-detail-image').unbind('click');
+      if (item.type == 'video') $('.smgt-detail-view .fa').fadeIn('fast');
       if (item.type == 'video' && item.service == 'youtube') {
         $('.smgt-detail-image').css('display', 'none');
         $('.smgt-detail-video').css('display', 'block');
@@ -338,7 +354,7 @@ const detailViewTemplate = () => `
             this.getFeedData({
               limit: this.opts.responseLimit,
               type: requestType,
-              requestService
+              service: requestService
             });
           }
         });
@@ -359,7 +375,8 @@ const detailViewTemplate = () => `
       if (second === 'image') {
         type = '&type=photo';
       }
-      const service = options.service !== '' ? '&service=' + options.service : '';
+      const service = options.service ? '&service=' + options.service : '';
+
 
       const url = `${self.opts.baseUrl}?feed_id=${self.opts.feedId}&access_token=${self.opts.token}${limit}${type}${service}`;
       return $.ajax({

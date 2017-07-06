@@ -30,7 +30,8 @@ var config = {
   twitterFilter: true,
   youtubeFilter: true,
   liveUpdate: false,
-  liveUpdateInterval: 30
+  liveUpdateInterval: 30,
+  caption: ''
 
   /* ---------- TEMPLATES ---------- */
 
@@ -117,6 +118,14 @@ var detailViewTemplate = function detailViewTemplate() {
     _createClass(SupermagneticFeed, [{
       key: 'init',
       value: function init() {
+
+        // init caption
+        if (this.opts.caption) {
+          this.$el.append('<h1 class="smgt-caption">' + this.opts.caption + '</h1>');
+        }
+        // apply styling choices
+        this.applyStyles();
+
         // initialize grid
         this.filterInit();
         this.$grid = $(gridTemplate());
@@ -161,6 +170,11 @@ var detailViewTemplate = function detailViewTemplate() {
         }, this.opts.liveUpdateInterval * 1000);
       }
     }, {
+      key: 'applyStyles',
+      value: function applyStyles() {
+        this.$el.css('background-color', this.opts.backgroundColor);
+      }
+    }, {
       key: 'detailViewInit',
       value: function detailViewInit() {
         var _this2 = this;
@@ -171,6 +185,7 @@ var detailViewTemplate = function detailViewTemplate() {
 
         this.detailView.on('click', function () {
           $('.smgt-detail-video .video-yt').attr('src', '');
+          $('.smgt-detail-view .fa').fadeOut('fast');
           _this2.detailView.fadeOut('fast');
         });
 
@@ -188,6 +203,7 @@ var detailViewTemplate = function detailViewTemplate() {
       value: function showDetailView(item) {
         // change detailview element
         $('.smgt-detail-image').unbind('click');
+        if (item.type == 'video') $('.smgt-detail-view .fa').fadeIn('fast');
         if (item.type == 'video' && item.service == 'youtube') {
           $('.smgt-detail-image').css('display', 'none');
           $('.smgt-detail-video').css('display', 'block');
@@ -284,7 +300,7 @@ var detailViewTemplate = function detailViewTemplate() {
               _this3.getFeedData({
                 limit: _this3.opts.responseLimit,
                 type: requestType,
-                requestService: requestService
+                service: requestService
               });
             }
           });
@@ -307,7 +323,7 @@ var detailViewTemplate = function detailViewTemplate() {
         if (second === 'image') {
           type = '&type=photo';
         }
-        var service = options.service !== '' ? '&service=' + options.service : '';
+        var service = options.service ? '&service=' + options.service : '';
 
         var url = self.opts.baseUrl + '?feed_id=' + self.opts.feedId + '&access_token=' + self.opts.token + limit + type + service;
         return $.ajax({
