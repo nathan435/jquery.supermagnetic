@@ -25,7 +25,7 @@ const config = {
     youtubeFilter: true,
     liveUpdate: false,
     liveUpdateInterval: 30,
-    caption: 'Posts for #supermagnetic'
+    caption: ''
 }
 
 
@@ -233,6 +233,7 @@ const detailViewTemplate = () => `
 
       this.detailView.on('click', () => {
         $('.smgt-detail-video .video-yt').attr('src', '');
+        $('.smgt-detail-view .fa').fadeOut('fast');
         this.detailView.fadeOut('fast');
       })
 
@@ -249,6 +250,7 @@ const detailViewTemplate = () => `
     showDetailView(item) {
       // change detailview element
       $('.smgt-detail-image').unbind('click');
+      if (item.type == 'video') $('.smgt-detail-view .fa').fadeIn('fast');
       if (item.type == 'video' && item.service == 'youtube') {
         $('.smgt-detail-image').css('display', 'none');
         $('.smgt-detail-video').css('display', 'block');
