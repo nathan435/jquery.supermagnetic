@@ -307,7 +307,9 @@ var detailViewTemplate = function detailViewTemplate() {
         if (second === 'image') {
           type = '&type=photo';
         }
-        var service = options.service !== '' ? '&service=' + options.service : '';
+        var service = options.service ? '&service=' + options.service : '';
+
+        console.log(options.service);
 
         var url = self.opts.baseUrl + '?feed_id=' + self.opts.feedId + '&access_token=' + self.opts.token + limit + type + service;
         return $.ajax({
