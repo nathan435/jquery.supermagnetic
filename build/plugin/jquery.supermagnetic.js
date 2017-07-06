@@ -291,7 +291,7 @@ var detailViewTemplate = function detailViewTemplate() {
               _this3.getFeedData({
                 limit: _this3.opts.responseLimit,
                 type: requestType,
-                requestService: requestService
+                service: requestService
               });
             }
           });
@@ -315,8 +315,6 @@ var detailViewTemplate = function detailViewTemplate() {
           type = '&type=photo';
         }
         var service = options.service ? '&service=' + options.service : '';
-
-        console.log(options.service);
 
         var url = self.opts.baseUrl + '?feed_id=' + self.opts.feedId + '&access_token=' + self.opts.token + limit + type + service;
         return $.ajax({

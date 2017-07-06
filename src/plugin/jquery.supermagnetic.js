@@ -345,7 +345,7 @@ const detailViewTemplate = () => `
             this.getFeedData({
               limit: this.opts.responseLimit,
               type: requestType,
-              requestService
+              service: requestService
             });
           }
         });
@@ -368,7 +368,6 @@ const detailViewTemplate = () => `
       }
       const service = options.service ? '&service=' + options.service : '';
 
-      console.log(options.service);
 
       const url = `${self.opts.baseUrl}?feed_id=${self.opts.feedId}&access_token=${self.opts.token}${limit}${type}${service}`;
       return $.ajax({
