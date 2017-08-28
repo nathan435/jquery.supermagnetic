@@ -91,6 +91,24 @@ const imageTileTemplate = (tileData, options) => `
 	</div>
 `;
 
+
+const imageUploadTileTemplate = (tileData, options) => `
+    	<div class="grid-item grid-item-${options.gridCols}-col" style="padding:${options.gridColGap}px">
+			<div class="smgt-tile smgt-tile-image-upload">
+				<img src="${tileData.imageSource}"/>
+				<footer>
+					<div class="smgt-media-icon">
+						<i class="fa fa-picture-o" aria-hidden="true"></i>
+					</div>
+					<div class="smgt-meta">
+						<p>${tileData.date}</p>
+						<p> </p>						
+					</div>
+				</footer>
+			</div>
+	</div>
+`;
+
 const textTileTemplate = (tileData, options) => `
 	<div class="grid-item grid-item-${options.gridCols}-col" style="padding:${options.gridColGap}px">
 			<div class="smgt-tile">
@@ -168,16 +186,14 @@ const detailViewTemplate = () => `
 			this.$el.data(name, this);
 
       this.lastData = [];
-
-			this.defaults = config;
-
-			const meta    = this.$el.data(name + '-opts');
-			this.opts     = $.extend(true, {}, this.defaults, meta, opts);
+      this.defaults = config;
+      const meta = this.$el.data(name + '-opts');
+      this.opts = $.extend(true, {}, this.defaults, meta, opts);
 
       this.isloading = false;
       this.dataitems = {};
 
-			this.init();
+      this.init();
 
       window.supermagnetic = this;
 		}
@@ -212,14 +228,14 @@ const detailViewTemplate = () => `
 		}
 
     liveUpdate() {
-      var self = this;
+      const self = this;
       setInterval(() => {
         $.when(this.makeRequest({
           limit: this.opts.responseLimit,
           type: '',
           service: ''
         })).then(function(items) {
-          var newItems = items.items.filter(item => {
+          const newItems = items.items.filter(item => {
             return self.lastData.filter(da => da.id == item.id).length == 0;
           });
 
@@ -236,7 +252,7 @@ const detailViewTemplate = () => `
     }
 
     detailViewInit() {
-      var self = this;
+      const self = this;
       this.detailView = $(detailViewTemplate());
       $('body').append(this.detailView);
 
@@ -369,7 +385,7 @@ const detailViewTemplate = () => `
 		}
 
     makeRequest(options, second) {
-      var self = this;
+      const self = this;
       const limit = options.limit !== '' ? '&limit=' + options.limit : 9;
       let type = options.type !== '' ? '&type=' + options.type : '';
       if (second === 'image') {
@@ -433,7 +449,8 @@ const detailViewTemplate = () => `
 				tile = $(textTileTemplate(tileData, this.opts));
         tile.data('itemid', item.id);
 			} else if (item.type === 'image' || item.type === 'photo') {
-				tile = $(imageTileTemplate(tileData, this.opts));
+			    if (item.service) tile = $(imageTileTemplate(tileData, this.opts));
+			    if (!item.service) tile = $(imageUploadTileTemplate(tileData, this.opts));
         tile.data('itemid', item.id);
 			} else if (item.type === 'video') {
         tile = $(videoTileTemplate(tileData, this.opts));
@@ -450,6 +467,7 @@ const detailViewTemplate = () => `
 		generateFeed(items, prepend) {
 			// self.$grid.masonry('remove', $('.grid .grid-item'));
       var self = this;
+      console.log(items);
 			// build tiles for each feed item
 			items.forEach((item) => {
 				this.generateTile(item, prepend);

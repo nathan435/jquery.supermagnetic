@@ -112,6 +112,10 @@ body {
   margin: 2px;
 }
 
+.smgt-tile-image-upload footer {
+  padding: 10px 3px;
+}
+
 .smgt-meta {
   display: table-cell;
   vertical-align: middle;

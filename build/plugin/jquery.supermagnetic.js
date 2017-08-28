@@ -75,6 +75,10 @@ var imageTileTemplate = function imageTileTemplate(tileData, options) {
   return '\n\t<div class="grid-item grid-item-' + options.gridCols + '-col" style="padding:' + options.gridColGap + 'px">\n\t\t\t<div class="smgt-tile">\n\t\t\t\t<img src="' + tileData.imageSource + '"/>\n\t\t\t\t<footer>\n\t\t\t\t\t<div class="smgt-media-icon">\n\t\t\t\t\t\t<i class="fa fa-' + tileData.socialMedia + '" aria-hidden="true"></i>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class="smgt-meta">\n\t\t\t\t\t\t<p>' + tileData.date + '</p>\n\t\t\t\t\t\t<p>' + tileData.author + '</p>\n\t\t\t\t\t</div>\n\t\t\t\t</footer>\n\t\t\t</div>\n\t</div>\n';
 };
 
+var imageUploadTileTemplate = function imageUploadTileTemplate(tileData, options) {
+  return '\n    \t<div class="grid-item grid-item-' + options.gridCols + '-col" style="padding:' + options.gridColGap + 'px">\n\t\t\t<div class="smgt-tile smgt-tile-image-upload">\n\t\t\t\t<img src="' + tileData.imageSource + '"/>\n\t\t\t\t<footer>\n\t\t\t\t\t<div class="smgt-media-icon">\n\t\t\t\t\t\t<i class="fa fa-picture-o" aria-hidden="true"></i>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class="smgt-meta">\n\t\t\t\t\t\t<p>' + tileData.date + '</p>\n\t\t\t\t\t\t<p> </p>\t\t\t\t\t\t\n\t\t\t\t\t</div>\n\t\t\t\t</footer>\n\t\t\t</div>\n\t</div>\n';
+};
+
 var textTileTemplate = function textTileTemplate(tileData, options) {
   return '\n\t<div class="grid-item grid-item-' + options.gridCols + '-col" style="padding:' + options.gridColGap + 'px">\n\t\t\t<div class="smgt-tile">\n\t\t\t\t<p class="smgt-text ' + tileData.socialMedia + '">\n\t\t\t\t\t' + tileData.text + '\n\t\t\t\t</p>\n\t\t\t\t<footer>\n\t\t\t\t\t<div class="smgt-media-icon">\n\t\t\t\t\t\t<i class="fa fa-' + tileData.socialMedia + '" aria-hidden="true"></i>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class="smgt-meta">\n\t\t\t\t\t\t<p>' + tileData.date + '</p>\n\t\t\t\t\t\t<p>' + tileData.author + '</p>\n\t\t\t\t\t</div>\n\t\t\t\t</footer>\n\t\t\t</div>\n\t</div>\n';
 };
@@ -101,9 +105,7 @@ var detailViewTemplate = function detailViewTemplate() {
       this.$el.data(name, this);
 
       this.lastData = [];
-
       this.defaults = config;
-
       var meta = this.$el.data(name + '-opts');
       this.opts = $.extend(true, {}, this.defaults, meta, opts);
 
@@ -379,7 +381,8 @@ var detailViewTemplate = function detailViewTemplate() {
           tile = $(textTileTemplate(tileData, this.opts));
           tile.data('itemid', item.id);
         } else if (item.type === 'image' || item.type === 'photo') {
-          tile = $(imageTileTemplate(tileData, this.opts));
+          if (item.service) tile = $(imageTileTemplate(tileData, this.opts));
+          if (!item.service) tile = $(imageUploadTileTemplate(tileData, this.opts));
           tile.data('itemid', item.id);
         } else if (item.type === 'video') {
           tile = $(videoTileTemplate(tileData, this.opts));
@@ -399,6 +402,7 @@ var detailViewTemplate = function detailViewTemplate() {
 
         // self.$grid.masonry('remove', $('.grid .grid-item'));
         var self = this;
+        console.log(items);
         // build tiles for each feed item
         items.forEach(function (item) {
           _this4.generateTile(item, prepend);
