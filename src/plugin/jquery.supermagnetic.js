@@ -333,34 +333,38 @@ const detailViewTemplate = () => `
                     if (!self.isloading) {
                         $('.grid-item').remove();
                         $('.grid').masonry('layout');
-                        $('.smgt-filter a').removeClass('smgt-filter-selected');
-                        let target;
-                        let type;
+                        let group = $(e.target).data('feed-filter-type') || $(e.target).parent().data('feed-filter-type');
+                        if (group === 'type') group = $('.smgt-filter .smgt-filter-types a');
+                        if (group === 'source') group = $('.smgt-filter .smgt-filter-sources a');
+
                         if ($(e.target).is('a')) {
-                            $(e.target).addClass('smgt-filter-selected');
-                            target = $(e.target).data('feed-filter-value');
-                            type = $(e.target).data('feed-filter-type');
+                            if ($(e.target).hasClass('smgt-filter-selected')) {
+                                $(e.target).removeClass('smgt-filter-selected');
+                            } else {
+                                group.removeClass('smgt-filter-selected');
+                                $(e.target).addClass('smgt-filter-selected');
+                            }
                         } else {
-                            $(e.target).parent().addClass('smgt-filter-selected');
-                            target = $(e.target).parent().data('feed-filter-value');
-                            type = $(e.target).parent().data('feed-filter-type');
+                            if ($(e.target).parent().hasClass('smgt-filter-selected')) {
+                                if ($(e.target).parent().data('feed-filter-type') === 'source') {
+                                    $('.smgt-filter .smgt-filter-sources a').removeClass('smgt-filter-selected');
+                                } else if ($(e.target).parent().data('feed-filter-type') === 'type') {
+                                    $('.smgt-filter .smgt-filter-types a').removeClass('smgt-filter-selected');
+                                }
+                                $(e.target).parent().removeClass('smgt-filter-selected');
+                            } else {
+                                group.removeClass('smgt-filter-selected');
+                                $(e.target).parent().addClass('smgt-filter-selected');
+                            }
                         }
 
-                        let requestType;
-                        let requestService;
+                        // try to get type filter option with class smgt-filter-selected
+                        const selectedFilterOptionForType = $('.smgt-filter .smgt-filter-types a.smgt-filter-selected');
+                        // try to get source filter option with class smgt-filter-selected
+                        const selectedFilterOptionForSource = $('.smgt-filter .smgt-filter-sources a.smgt-filter-selected');
 
-                        switch(type){
-                            case 'type':
-                                requestType = target;
-                                requestService = '';
-                            break;
-                            case 'source':
-                                requestType = '';
-                                requestService = target;
-                            break;
-                            default:
-                                requestType = '';
-                        }
+                        const requestType = selectedFilterOptionForType.data('feed-filter-value') || '';
+                        const requestService = selectedFilterOptionForSource.data('feed-filter-value') || '';
 
 
                         this.getFeedData({
