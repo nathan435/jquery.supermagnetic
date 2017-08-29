@@ -233,6 +233,11 @@ var detailViewTemplate = function detailViewTemplate() {
                     $('.smgt-detail-image').css('background-color', color);
                 }
 
+                $('.smgt-detail-meta a').show();
+                if (item.type == 'image' && !item.service) {
+                    $('.smgt-detail-meta a').hide();
+                }
+
                 $('.smgt-detail-description').text(item.text);
                 $('.smgt-detail-meta a').prop("href", item.url);
 
